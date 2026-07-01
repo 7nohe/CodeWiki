@@ -1,4 +1,4 @@
-from pydantic_ai import RunContext, Tool, Agent
+from pydantic_ai import RunContext, Tool, Agent, UsageLimits
 
 from codewiki.src.be.agent_tools.deps import CodeWikiDeps
 from codewiki.src.be.agent_tools.read_code_components import read_code_components_tool
@@ -78,7 +78,8 @@ async def generate_sub_module_documentation(
                 components=ctx.deps.components,
                 module_tree=ctx.deps.module_tree,
             ),
-            deps=ctx.deps
+            deps=ctx.deps,
+            usage_limits=UsageLimits(request_limit=200),
         )
 
         # remove the sub-module name from the path to current module and the module tree

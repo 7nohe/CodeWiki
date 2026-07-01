@@ -40,15 +40,18 @@ def _should_use_max_completion_tokens(model_name: str, base_url: str) -> bool:
 
 def _build_model_settings(config: Config, model_name: str) -> OpenAIModelSettings:
     """Build model settings with the correct token parameter."""
+    # gpt-5 / o-series reasoning models reject temperature != 1, so omit it.
+    ml = model_name.lower()
+    is_reasoning = any(p in ml for p in ("gpt-5", "o1", "o3", "o4"))
     if _should_use_max_completion_tokens(model_name, config.llm_base_url):
-        return OpenAIModelSettings(
-            temperature=0.0,
-            max_completion_tokens=config.max_tokens
-        )
-    return OpenAIModelSettings(
-        temperature=0.0,
-        max_tokens=config.max_tokens
-    )
+        kwargs = {"max_completion_tokens": config.max_tokens}
+        if not is_reasoning:
+            kwargs["temperature"] = 0.0
+        return OpenAIModelSettings(**kwargs)
+    kwargs = {"max_tokens": config.max_tokens}
+    if not is_reasoning:
+        kwargs["temperature"] = 0.0
+    return OpenAIModelSettings(**kwargs)
 
 
 def _get_litellm_model_name(model_name: str, provider: str) -> str:

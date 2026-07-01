@@ -13,7 +13,7 @@ import os
 import traceback
 from typing import Any, Dict, List
 
-from pydantic_ai import Agent
+from pydantic_ai import Agent, UsageLimits
 
 from codewiki.src.be.agent_tools.deps import CodeWikiDeps
 from codewiki.src.be.agent_tools.generate_sub_module_documentations import (
@@ -118,6 +118,7 @@ class PydanticAIBackend(LLMBackend):
                     module_tree=deps.module_tree,
                 ),
                 deps=deps,
+                usage_limits=UsageLimits(request_limit=200),
             )
             file_manager.save_json(deps.module_tree, module_tree_path)
             return deps.module_tree
